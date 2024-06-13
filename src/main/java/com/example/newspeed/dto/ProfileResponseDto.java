@@ -3,7 +3,9 @@ package com.example.newspeed.dto;
 import com.example.newspeed.entity.User;
 import jakarta.persistence.Column;
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class ProfileResponseDto {
     //사용자 ID, 이름, 한 줄 소개, 이메일을 볼 수 있습니다.
