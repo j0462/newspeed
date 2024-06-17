@@ -6,52 +6,129 @@ import com.example.newspeed.entity.Comment;
 import com.example.newspeed.entity.Content;
 import com.example.newspeed.entity.User;
 import com.example.newspeed.repository.CommentRepository;
+import com.example.newspeed.repository.ContentRepository;
+import com.example.newspeed.repository.UserRepository;
 import com.example.newspeed.security.UserDetailsImpl;
 import com.example.newspeed.service.CommentService;
 import com.example.newspeed.service.ContentService;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class) // MockitoExtension을 사용하여 Mockito와 함께 사용한다는 것을 선언
 public class CommentServiceTest {
-
-    @InjectMocks // Mock을 주입받을 대상 클래스를 선언
-    private CommentService commentService;
-
-    @Mock // Mock 객체를 생성
-    private CommentRepository commentRepository;
+    @Mock
+    CommentRepository commentRepository;
 
     @Mock
-    private ContentService contentService;
+    ContentService contentService;
+
+    @InjectMocks
+    CommentService commentService;
+
+    User user;
+    Content content;
+    Comment comment;
+
+    @BeforeEach
+    void setup() {
+        user = new User();
+        user.setId(1L);
+        user.setUserName("testuser");
+        user.setPassword("password");
+
+        content = new Content();
+        content.setId(1L);
+        content.setContent("Test Content");
+
+        comment = new Comment(user, "This is a test comment", content);
+        comment.setId(1L);
+    }
 
     @Test
-    public void testCreateComment() {
-        // 테스트에 필요한 Mock 데이터 설정
-        Long contentId = 1L;
-        CommentRequest request = new CommentRequest();
-        request.setComment("Test comment");
-        UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
-        User mockUser = mock(User.class);
-        when(userDetails.getUser()).thenReturn(mockUser);
+    @DisplayName("댓글 생성 테스트")
+    void testCreateComment() {
+        // given
+        CommentRequest requestDto = new CommentRequest();
+        requestDto.setComment("This is a test comment");
+        UserDetailsImpl userDetails = new UserDetailsImpl(user);
 
-        Content mockContent = mock(Content.class);
-        when(contentService.getContentById2(contentId)).thenReturn(mockContent);
+        given(contentService.getContentById2(content.getId())).willReturn(content);
 
-        // 댓글 생성에 대한 Mock 동작 설정
-        Comment mockComment = new Comment(mockUser, request.getComment(), mockContent);
-        when(commentRepository.save(any(Comment.class))).thenReturn(mockComment);
+        // when
+        Long commentId = commentService.create(content.getId(), requestDto, userDetails);
 
-        // 테스트 실행
-        Long commentId = commentService.create(contentId, request, userDetails);
+        // then
+        ArgumentCaptor<Comment> commentCaptor = ArgumentCaptor.forClass(Comment.class);
+        verify(commentRepository).save(commentCaptor.capture());
+        Comment savedComment = commentCaptor.getValue();
 
-        // 결과 확인
-        assertNotNull(commentId);
-        assertEquals(mockComment.getId(), commentId);
+        assertEquals("This is a test comment", savedComment.getComment());
+        assertEquals(user, savedComment.getUser());
+        assertEquals(content, savedComment.getNews());
+    }
+
+    @Test
+    @DisplayName("댓글 수정 테스트")
+    void testUpdateComment() {
+        // given
+        CommentRequest requestDto = new CommentRequest();
+        requestDto.setComment("Updated comment text");
+        UserDetailsImpl userDetails = new UserDetailsImpl(user);
+
+        given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
+
+        // when
+        Long updatedCommentId = commentService.update(comment.getId(), requestDto, userDetails);
+
+        // then
+        assertNotNull(updatedCommentId);
+        assertEquals(comment.getId(), updatedCommentId);
+        assertEquals("Updated comment text", comment.getComment());
+    }
+
+    @Test
+    @DisplayName("댓글 조회 테스트")
+    void testGetComment() {
+        // given
+        given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
+
+        // when
+        CommentGetResponse response = commentService.get(comment.getId());
+
+        // then
+        assertNotNull(response);
+        assertEquals(comment.getId(), response.getId());
+        assertEquals(comment.getUser().getId(), response.getUserId());
+        assertEquals(comment.getComment(), response.getComment());
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 테스트")
+    void testDeleteComment() {
+        // given
+        UserDetailsImpl userDetails = new UserDetailsImpl(user);
+
+        given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
+        doNothing().when(commentRepository).delete(comment);
+
+        // when
+        Long deletedCommentId = commentService.delete(comment.getId(), userDetails);
+
+        // then
+        assertNotNull(deletedCommentId);
+        assertEquals(comment.getId(), deletedCommentId);
+
+        verify(commentRepository, times(1)).delete(comment);
     }
 }
