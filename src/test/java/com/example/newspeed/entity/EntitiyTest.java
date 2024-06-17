@@ -1,9 +1,5 @@
-package com.example.newspeed.dto;
+package com.example.newspeed.entity;
 
-import com.example.newspeed.entity.Comment;
-import com.example.newspeed.entity.Content;
-import com.example.newspeed.entity.Like;
-import com.example.newspeed.entity.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

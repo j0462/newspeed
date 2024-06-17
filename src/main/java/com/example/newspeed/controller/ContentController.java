@@ -5,6 +5,7 @@ import com.example.newspeed.dto.ContentDto;
 import com.example.newspeed.dto.ContentRequestDto;
 import com.example.newspeed.security.UserDetailsImpl;
 import com.example.newspeed.service.ContentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/content")
 public class ContentController {

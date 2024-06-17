@@ -3,11 +3,13 @@ package com.example.newspeed.controller;
 import com.example.newspeed.entity.User;
 import com.example.newspeed.security.UserDetailsImpl;
 import com.example.newspeed.service.LikeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class LikeController {

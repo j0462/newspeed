@@ -1,5 +1,6 @@
 package com.example.newspeed.dto;
 
+import com.example.newspeed.dto.*;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import org.junit.jupiter.api.Assertions;
@@ -183,7 +184,7 @@ public class DtoTest {
     public void test10() {
         SignUpRequestDto requestDto = new SignUpRequestDto();
         requestDto.setUserId("testUser123");
-        requestDto.setPassword("Test123!");
+        requestDto.setPassword("Test12345!");
         requestDto.setEmail("test@example.com");
 
         Set<ConstraintViolation<SignUpRequestDto>> violations = validator.validate(requestDto);

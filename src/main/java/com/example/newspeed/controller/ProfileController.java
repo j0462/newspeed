@@ -5,12 +5,14 @@ import com.example.newspeed.dto.ProfileResponseDto;
 import com.example.newspeed.security.UserDetailsImpl;
 import com.example.newspeed.service.ProfileService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/profile")
 public class ProfileController {
